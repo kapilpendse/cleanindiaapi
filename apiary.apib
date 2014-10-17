@@ -1,46 +1,121 @@
 FORMAT: 1A
 
-# CleanIndiaAPI
-Notes API is a *short texts saving* service similar to its physical paper presence on your table.
+# Clean India API
+A common denominator API for *Clean India*. This spec defines the interface for front ends (app, mobile web, web) to communicate with backend.
 
-# Group Notes
-Notes related resources of the **Notes API**
+# Group Spotfixes
+Resources related to spot fixes
 
-## Notes Collection [/notes]
-### List all Notes [GET]
-+ Response 200 (application/json)
-
-        [{
-          "id": 1, "title": "Jogging in park"
-        }, {
-          "id": 2, "title": "Pick-up posters from post-office"
-        }]
-
-### Create a Note [POST]
-+ Request (application/json)
-
-        { "title": "Buy cheese and bread for breakfast." }
-
-+ Response 201 (application/json)
-
-        { "id": 3, "title": "Buy cheese and bread for breakfast." }
-
-## Note [/notes/{id}]
-A single Note object with all its details
+## Find nearby spotfixes [/spotfix/list{?latitude,longitude,max_results}]
+List of spotfixes is represented in the geojson format which is easy to feed into mapping API like Google Maps.
 
 + Parameters
-    + id (required, number, `1`) ... Numeric `id` of the Note to perform action with. Has example value.
+    + latitude (required, number, `24.9929619`) ... `latitude` of location around which to search.
+    + longitude (required, number, `121.4477716`) ... `longitude` of location around which to search.
+    + max_results (optional, number, `25`) ... Maximum number of spotfixes to be fetched. If not specified, maximum 25 spotfixes are returned by default.
 
-### Retrieve a Note [GET]
+### Find nearby spotfixes [GET]
++ Response 200 (application/vnd.geo+json)
+
+        {
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "id": "542c44b3e4b02bea59225b3d",
+                        "where": "Test",
+                        "description": "Test desc",
+                        "date": "01/01/2015 12:00",
+                        "photos": [
+                            "542c44b2e4b02bea59225b32"
+                        ],
+                        "plannedby": {
+                            "id": "542c42e9e4b02bea59225b2d",
+                            "name": "dravid"
+                        },
+                        "participants": [
+                            {
+                                "id": "542c42e9e4b02bea59225b2d",
+                                "name": "dravid"
+                            }
+                        ]
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            121.45557969029645,
+                            25.00558830953123
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "id": "542c43a3e4b02bea59225b30",
+                        "where": "Nanya night market entrance",
+                        "description": "Broken footpath to be fixed and some benches to be installed",
+                        "date": "02/10/2014 12:00",
+                        "photos": [
+                            "542c43a2e4b02bea59225b2e",
+                            "543df5fae4b0abdd3f1e5a8a"
+                        ],
+                        "plannedby": {
+                            "id": "542c42e9e4b02bea59225b2d",
+                            "name": "dravid"
+                        },
+                        "participants": [
+                            {
+                                "id": "542c42e9e4b02bea59225b2d",
+                                "name": "dravid"
+                            },
+                            {
+                                "id": "543f7a2ce4b0ed5022cb9459",
+                                "name": "test"
+                            }
+                        ]
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            121.45534279999998,
+                            25.005558
+                        ]
+                    }
+                }
+            ],
+            "type": "FeatureCollection"
+        }
+
+## New spotfix [/spotfix/new{?where,description,date,latitude,longitude,before_photo_id}]
+Create a new spotfix by providing at least 1 photo of the spot BEFORE it is fixed.
+
++ Parameters
+    + where (required, text, `Near Saras Baug entrance`) ... A short description of the location.
+    + description (required, text, `Fix broken sidewalk and install a dustbin`) ... Description of what is to be done.
+    + date (required, date, `dd/mm/yyyy hh:mm`) ... Date and time when the spot will be fixed.
+    + latitude (required, number, `24.9929619`) ... `latitude` of the location.
+    + longitude (required, number, `121.4477716`) ... `longitude` of the location.
+    + before_photo_id (required, text, `542c44b2e4b02bea59225b32`) ... Blob ID of a photo of the spot taken BEFORE the fix.
+
+### Create a new spotfix [POST]
 + Response 200 (application/json)
-
-    + Header
-
-            X-My-Header: The Value
 
     + Body
 
-            { "id": 2, "title": "Pick-up posters from post-office" }
+            { "result": "ok", "id": "543f7a2ce4b0ed5022cb9459" }
 
-### Remove a Note [DELETE]
-+ Response 204
+
+## Cancel a spotfix [/spotfix/cancel{?id,reason}]
+Cancel a planned spotfix
+
++ Parameters
+    + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to be cancelled.
+    + reason (required, text, `Insufficient people`) ... `reason` for cancellation.
+
+### Cancel a planned spotfix by giving a reason [POST]
++ Response 200 (application/json)
+
+    + Body
+
+            { "result": "ok" }
+
