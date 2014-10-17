@@ -86,7 +86,7 @@ List of spotfixes is represented in the geojson format which is easy to feed int
             "type": "FeatureCollection"
         }
 
-## New spotfix [/spotfix/new{?where,description,date,latitude,longitude,before_photo_id}]
+## New spotfix [/spotfix/new{?where,description,date,latitude,longitude,photo_id}]
 Create a new spotfix by providing at least 1 photo of the spot BEFORE it is fixed.
 
 + Parameters
@@ -95,7 +95,7 @@ Create a new spotfix by providing at least 1 photo of the spot BEFORE it is fixe
     + date (required, date, `dd/mm/yyyy hh:mm`) ... Date and time when the spot will be fixed.
     + latitude (required, number, `24.9929619`) ... `latitude` of the location.
     + longitude (required, number, `121.4477716`) ... `longitude` of the location.
-    + before_photo_id (required, text, `542c44b2e4b02bea59225b32`) ... Blob ID of a photo of the spot taken BEFORE the fix.
+    + photo_id (required, text, `542c44b2e4b02bea59225b32`) ... ID of an uploaded photo of the spot taken BEFORE the fix. This photo is automatically tagged as BEFORE.
 
 ### Create a new spotfix [POST]
 + Response 200 (application/json)
@@ -105,6 +105,38 @@ Create a new spotfix by providing at least 1 photo of the spot BEFORE it is fixe
             { "result": "ok", "id": "543f7a2ce4b0ed5022cb9459" }
 
 
+## Upload a photo [/spotfix/photo/upload{?photo}]
+Upload a new photo of spotfix
+
++ Parameters
+    + photo (required, blob) ... The photo blob. Image formats accepted: PNG, JPEG.
+
+### Upload a photo [POST]
++ Response 200 (application/json)
+
+    + Body
+
+            { "result": "ok", "photo_id": "543f7a2ce4b0ed5022cb9459" }
+
+## Download a photo [/spotfix/photo/download{?photo_id}]
+Download a photo of spotfix by photo ID
+
++ Parameters
+    + photo_id (required, text, `543f7a2ce4b0ed5022cb9459`) ... ID of the photo.
+
+### Download a photo [GET]
++ Response 200 (image/jpeg)
+
+    + Body
+
+            The JPEG image data.
+
++ Response 200 (image/png)
+
+    + Body
+
+            The PNG image data.
+
 ## Cancel a spotfix [/spotfix/cancel{?id,reason}]
 Cancel a planned spotfix
 
@@ -113,6 +145,47 @@ Cancel a planned spotfix
     + reason (required, text, `Insufficient people`) ... `reason` for cancellation.
 
 ### Cancel a planned spotfix by giving a reason [POST]
++ Response 200 (application/json)
+
+    + Body
+
+            { "result": "ok" }
+
+## Join a spotfix [/spotfix/join{?id}]
+Join a spotfix as a volunteer
+
++ Parameters
+    + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to join.
+
+### Join a spotfix [POST]
++ Response 200 (application/json)
+
+    + Body
+
+            { "result": "ok" }
+
+## Leave a spotfix [/spotfix/leave{?id}]
+Leave a spotfix which one has volunteered for
+
++ Parameters
+    + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to leave.
+
+### Leave a spotfix [POST]
++ Response 200 (application/json)
+
+    + Body
+
+            { "result": "ok" }
+
+## Add photo to a spotfix [/spotfix/photo/add{?id,photo_id,tag}]
+Add photo to a spotfix with a tag like BEFORE, AFTER, DURING, SIDE_BY_SIDE and so on
+
++ Parameters
+    + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to add photo to.
+    + photo_id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the uploaded photo.
+    + tag (required, text, `BEFORE`) ... Tag for the photo. One of these: BEFORE, AFTER, DURING, SIDE_BY_SIDE
+
+### Add photo to a spotfix [POST]
 + Response 200 (application/json)
 
     + Body
