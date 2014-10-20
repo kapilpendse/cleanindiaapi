@@ -6,15 +6,14 @@ A common denominator API for *Clean India*. This spec defines the interface for 
 # Group Spotfixes
 Resources related to spot fixes
 
-## Find nearby spotfixes [/spotfix/list{?latitude,longitude,max_results}]
-List of spotfixes is represented in the geojson format which is easy to feed into mapping API like Google Maps.
+## GET /spotfixes{?latitude,longitude,max_results}
+Find nearby spotfixes. The collection of nearby spotfixes described in geojson format which can be directly fed into mapping APIs like Google Maps.
 
 + Parameters
     + latitude (required, number, `24.9929619`) ... `latitude` of location around which to search.
     + longitude (required, number, `121.4477716`) ... `longitude` of location around which to search.
     + max_results (optional, number, `25`) ... Maximum number of spotfixes to be fetched. If not specified, maximum 25 spotfixes are returned by default.
 
-### Find nearby spotfixes [GET]
 + Response 200 (application/vnd.geo+json)
 
         {
@@ -86,7 +85,7 @@ List of spotfixes is represented in the geojson format which is easy to feed int
             "type": "FeatureCollection"
         }
 
-## New spotfix [/spotfix/new{?where,description,date,latitude,longitude,photo_id}]
+## POST /spotfix{?where,description,date,latitude,longitude,photo_id}
 Create a new spotfix by providing at least 1 photo of the spot BEFORE it is fixed.
 
 + Parameters
@@ -97,34 +96,93 @@ Create a new spotfix by providing at least 1 photo of the spot BEFORE it is fixe
     + longitude (required, number, `121.4477716`) ... `longitude` of the location.
     + photo_id (required, text, `542c44b2e4b02bea59225b32`) ... ID of an uploaded photo of the spot taken BEFORE the fix. This photo is automatically tagged as BEFORE.
 
-### Create a new spotfix [POST]
 + Response 200 (application/json)
 
     + Body
 
-            { "result": "ok", "id": "543f7a2ce4b0ed5022cb9459" }
+            {
+                "result": "ok",
+                "id": "543f7a2ce4b0ed5022cb9459"
+            }
 
 
-## Upload a photo [/spotfix/photo/upload{?photo}]
-Upload a new photo of spotfix
+## GET /spotfix{?id}
+Get details of a spotfix identified by the input parameter `id`
+
++ Parameters
+    + id (required, text, `542c44b2e4b02bea59225b32`) ... `id` of the spotfix whose details are required.
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "result": "ok",
+                "id": "543f7a2ce4b0ed5022cb9459",
+                "where": "Nanya night market entrance",
+                "description": "Broken footpath to be fixed and some benches to be installed",
+                "date": "02/10/2014 12:00",
+                "photos": [
+                    "542c43a2e4b02bea59225b2e",
+                    "543df5fae4b0abdd3f1e5a8a"
+                ],
+                "plannedby": {
+                    "id": "542c42e9e4b02bea59225b2d",
+                    "name": "dravid"
+                },
+                "participants": [
+                    {
+                        "id": "542c42e9e4b02bea59225b2d",
+                        "name": "dravid"
+                    },
+                    {
+                        "id": "543f7a2ce4b0ed5022cb9459",
+                        "name": "test"
+                    }
+                ]
+            }
+
+## PUT /spotfix{?id,where,description,date,latitude,longitude}
+Updates details of a spotfix. Only the spotfix organiser can do this.
+
++ Parameters
+    + id (required, text, `542c44b2e4b02bea59225b32`) ... `id` of the spotfix whose details are required.
+    + where (required, text, `Near Saras Baug entrance`) ... A short description of the location.
+    + description (required, text, `Fix broken sidewalk and install a dustbin`) ... Description of what is to be done.
+    + date (required, date, `dd/mm/yyyy hh:mm`) ... Date and time when the spot will be fixed.
+    + latitude (required, number, `24.9929619`) ... `latitude` of the location.
+    + longitude (required, number, `121.4477716`) ... `longitude` of the location.
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "result": "ok"
+            }
+
+
+## POST /spotfix/photo{?photo}
+Upload a spotfix photo
 
 + Parameters
     + photo (required, blob) ... The photo blob. Image formats accepted: PNG, JPEG.
 
-### Upload a photo [POST]
 + Response 200 (application/json)
 
     + Body
 
-            { "result": "ok", "photo_id": "543f7a2ce4b0ed5022cb9459" }
+            {
+                "result": "ok",
+                "photo_id": "543f7a2ce4b0ed5022cb9459"
+            }
 
-## Download a photo [/spotfix/photo/download{?photo_id}]
-Download a photo of spotfix by photo ID
+## GET /spotfix/photo{?photo_id}
+Download a spotfix photo by photo ID
 
 + Parameters
     + photo_id (required, text, `543f7a2ce4b0ed5022cb9459`) ... ID of the photo.
 
-### Download a photo [GET]
 + Response 200 (image/jpeg)
 
     + Body
@@ -137,58 +195,95 @@ Download a photo of spotfix by photo ID
 
             The PNG image data.
 
-## Cancel a spotfix [/spotfix/cancel{?id,reason}]
-Cancel a planned spotfix
+## POST /spotfix/cancel{?id,reason}
+Cancel a planned spotfix. Only the organiser may cancel a spotfix.
 
 + Parameters
     + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to be cancelled.
     + reason (required, text, `Insufficient people`) ... `reason` for cancellation.
 
-### Cancel a planned spotfix by giving a reason [POST]
 + Response 200 (application/json)
 
     + Body
 
-            { "result": "ok" }
+            {
+                "result": "ok"
+            }
 
-## Join a spotfix [/spotfix/join{?id}]
-Join a spotfix as a volunteer
+## POST /spotfix/join{?id}
+Join a spotfix as a volunteer. The logged in user is added to the list of participants of the spotfix.
 
 + Parameters
     + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to join.
 
-### Join a spotfix [POST]
 + Response 200 (application/json)
 
     + Body
 
-            { "result": "ok" }
+            {
+                "result": "ok"
+            }
 
-## Leave a spotfix [/spotfix/leave{?id}]
-Leave a spotfix which one has volunteered for
+## POST /spotfix/leave{?id}
+Leave a spotfix which one has volunteered for. The logged in user is removed from the list of participants.
 
 + Parameters
     + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to leave.
 
-### Leave a spotfix [POST]
 + Response 200 (application/json)
 
     + Body
 
-            { "result": "ok" }
+            {
+                "result": "ok"
+            }
 
-## Add photo to a spotfix [/spotfix/photo/add{?id,photo_id,tag}]
-Add photo to a spotfix with a tag like BEFORE, AFTER, DURING, SIDE_BY_SIDE and so on
+## POST /spotfix/photo/add{?id,photo_id,tag}
+Add photo to a spotfix with a tag like BEFORE, AFTER, DURING, SIDE_BY_SIDE and so on.
+The photo must be already uploaded using the upload photo API.
 
 + Parameters
     + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to add photo to.
     + photo_id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the uploaded photo.
     + tag (required, text, `BEFORE`) ... Tag for the photo. One of these: BEFORE, AFTER, DURING, SIDE_BY_SIDE
 
-### Add photo to a spotfix [POST]
 + Response 200 (application/json)
 
     + Body
 
-            { "result": "ok" }
+            {
+                "result": "ok"
+            }
+
+## POST /spotfix/photo/remove{?id,photo_id,tag}
+Remove photo from a spotfix.
+
++ Parameters
+    + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to add photo to.
+    + photo_id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the uploaded photo.
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "result": "ok"
+            }
+
+## POST /spotfix/photo/retag{?id,photo_id}
+Change the tag of a photo which is already added to a spotfix.
+Valid tags are BEFORE, AFTER, DURING & SIDE_BY_SIDE.
+
++ Parameters
+    + id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the spotfix to add photo to.
+    + photo_id (required, text, `543f7a2ce4b0ed5022cb9459`) ... `id` of the uploaded photo.
+    + tag (required, text, `BEFORE`) ... Tag for the photo. One of these: BEFORE, AFTER, DURING, SIDE_BY_SIDE
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "result": "ok"
+            }
 
