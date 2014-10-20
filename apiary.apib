@@ -162,39 +162,6 @@ Updates details of a spotfix. Only the spotfix organiser can do this.
             }
 
 
-## POST /spotfix/photo{?photo}
-Upload a spotfix photo
-
-+ Parameters
-    + photo (required, blob) ... The photo blob. Image formats accepted: PNG, JPEG.
-
-+ Response 200 (application/json)
-
-    + Body
-
-            {
-                "result": "ok",
-                "photo_id": "543f7a2ce4b0ed5022cb9459"
-            }
-
-## GET /spotfix/photo{?photo_id}
-Download a spotfix photo by photo ID
-
-+ Parameters
-    + photo_id (required, text, `543f7a2ce4b0ed5022cb9459`) ... ID of the photo.
-
-+ Response 200 (image/jpeg)
-
-    + Body
-
-            The JPEG image data.
-
-+ Response 200 (image/png)
-
-    + Body
-
-            The PNG image data.
-
 ## POST /spotfix/cancel{?id,reason}
 Cancel a planned spotfix. Only the organiser may cancel a spotfix.
 
@@ -237,6 +204,39 @@ Leave a spotfix which one has volunteered for. The logged in user is removed fro
             {
                 "result": "ok"
             }
+
+## POST /spotfix/photo{?photo}
+Upload a spotfix photo
+
++ Parameters
+    + photo (required, blob) ... The photo blob. Image formats accepted: PNG, JPEG.
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "result": "ok",
+                "photo_id": "543f7a2ce4b0ed5022cb9459"
+            }
+
+## GET /spotfix/photo{?photo_id}
+Download a spotfix photo by photo ID
+
++ Parameters
+    + photo_id (required, text, `543f7a2ce4b0ed5022cb9459`) ... ID of the photo.
+
++ Response 200 (image/jpeg)
+
+    + Body
+
+            The JPEG image data.
+
++ Response 200 (image/png)
+
+    + Body
+
+            The PNG image data.
 
 ## POST /spotfix/photo/add{?id,photo_id,tag}
 Add photo to a spotfix with a tag like BEFORE, AFTER, DURING, SIDE_BY_SIDE and so on.
